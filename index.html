@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="theme-navy">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trade Rush — Gestão de Banca e Operações</title>
+  <meta name="description" content="Trade Rush: gestão de banca, metas e controle de operações de trading.">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+
+
+  <!-- Configurações PWA Mobile -->
+  <meta name="theme-color" content="#070d18">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Trade Rush">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            appGreen: '#10b981',
+            appGreenGlow: '#00f59b',
+            appRed: '#ef4444',
+            appYellow: '#f59e0b',
+            appBlue: '#38bdf8',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome & Google Fonts (Plus Jakarta Sans) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ================= 🎨 5 TEMAS DINÂMICOS ================= */
+    .theme-navy {
+      --bg-color: #070d18;
+      --card-bg: #0e1628;
+      --card-border: #1a263e;
+      --text-muted: #8194b0;
+      --accent-main: #38bdf8;
+    }
+    .theme-cyber {
+      --bg-color: #030509;
+      --card-bg: #090f1e;
+      --card-border: #18243c;
+      --text-muted: #64748b;
+      --accent-main: #00f0ff;
+    }
+    .theme-gold {
+      --bg-color: #050505;
+      --card-bg: #120e08;
+      --card-border: #382710;
+      --text-muted: #a89478;
+      --accent-main: #f59e0b;
+    }
+    .theme-stealth {
+      --bg-color: #000000;
+      --card-bg: #0f0f12;
+      --card-border: #222227;
+      --text-muted: #71717a;
+      --accent-main: #a1a1aa;
+    }
+    .theme-emerald {
+      --bg-color: #020c08;
+      --card-bg: #071912;
+      --card-border: #103325;
+      --text-muted: #5c8c79;
+      --accent-main: #10b981;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: #f1f5f9;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      transition: background-color 0.3s ease;
+    }
+    .app-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      transition: all 0.3s ease;
+    }
+    .text-green-num {
+      color: #10b981 !important;
+      text-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+    }
+    .active-nav-pill {
+      background: var(--card-border) !important;
+      color: var(--accent-main) !important;
+      border-bottom: 2px solid var(--accent-main);
+    }
+    /* ===== Cabeçalho superior: 100% guiado pelas variáveis do tema ===== */
+    .tr-header {
+      background: var(--bg-color);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--accent-main) 12%, var(--bg-color)) 0%, var(--bg-color) 100%);
+      border-color: var(--card-border);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .tr-logo {
+      background: linear-gradient(135deg, var(--card-border), var(--accent-main));
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      transition: background 0.3s ease;
+    }
+    .tr-logo-inner { background: var(--bg-color); transition: background 0.3s ease; }
+    .tr-logo-icon { color: var(--accent-main); transition: color 0.3s ease; }
+    .tr-title { color: var(--accent-main); transition: color 0.3s ease; }
+    .tr-badge {
+      background: var(--card-bg);
+      color: var(--accent-main);
+      border: 1px solid var(--card-border);
+      border: 1px solid color-mix(in srgb, var(--accent-main) 45%, var(--card-border));
+      transition: all 0.3s ease;
+    }
+    .tr-subtitle { color: var(--accent-main); opacity: 0.8; transition: color 0.3s ease; }
+    .tr-subtitle-dot { background: var(--accent-main); transition: background 0.3s ease; }
+    .tr-header-btn { color: var(--accent-main); transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease; }
+    .custom-scroll::-webkit-scrollbar { height: 4px; }
+    .custom-scroll::-webkit-scrollbar-track { background: var(--bg-color); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+  </style>
+</head>
+<body class="pb-28 antialiased selection:bg-appGreen selection:text-black">
+
+  <!-- Header Superior — Trade Rush (cores 100% controladas pelo tema selecionado) -->
+  <header class="tr-header border-b px-4 py-3 sticky top-0 z-50 flex items-center justify-between">
+    <div class="flex items-center space-x-2.5">
+      <!-- Escudo Logo (acompanha o tema) -->
+      <div class="tr-logo w-9 h-9 rounded-xl p-0.5">
+        <div class="tr-logo-inner w-full h-full rounded-[10px] flex items-center justify-center">
+          <svg class="tr-logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 5v3M6 15v3M12 3v5M12 14v5M18 6v4M18 16v2"/>
+            <rect x="4.5" y="8" width="3" height="7" rx="0.8" fill="currentColor" fill-opacity="0.25"/>
+            <rect x="10.5" y="8" width="3" height="6" rx="0.8" fill="currentColor" fill-opacity="0.25"/>
+            <rect x="16.5" y="10" width="3" height="6" rx="0.8" fill="currentColor" fill-opacity="0.25"/>
+            <path d="M3 18l6-5 4 2 8-8"/>
+            <path d="M16 7h5v5"/>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center space-x-1.5">
+          <!-- Título (acompanha o tema) -->
+          <h1 class="tr-title font-extrabold text-sm tracking-wide">
+            TRADE RUSH
+          </h1>
+          <span class="tr-badge font-black text-[9px] px-1.5 py-0.5 rounded-md tracking-wider">
+            PRO
+          </span>
+        </div>
+        <!-- Subtítulo (acompanha o tema) -->
+        <p class="tr-subtitle text-[10px] font-medium flex items-center space-x-1">
+          <span class="tr-subtitle-dot w-1.5 h-1.5 rounded-full"></span>
+          <span>Gestão de Banca &amp; Operações</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Controles Rápidos do Topo -->
+    <div class="flex items-center space-x-1.5">
+      <button onclick="toggleVoz()" id="btnVoz" title="Voz" class="tr-header-btn w-8 h-8 rounded-xl app-card flex items-center justify-center hover:text-white transition active:scale-95 text-xs">
+        <i class="fa-solid fa-volume-high"></i>
+      </button>
+
+      <button onclick="abrirModalTemas()" title="Trocar Tema (5 Opções)" class="tr-header-btn w-8 h-8 rounded-xl app-card flex items-center justify-center hover:text-white transition active:scale-95 text-xs">
+        <i class="fa-solid fa-palette"></i>
+      </button>
+
+      <button onclick="gerarCardVip()" title="Relatório de Performance" class="tr-header-btn w-8 h-8 rounded-xl app-card flex items-center justify-center hover:text-white transition active:scale-95 text-xs">
+        <i class="fa-solid fa-share-nodes"></i>
+      </button>
+
+      <button onclick="abrirConfigGeral()" title="Configurações" class="tr-header-btn w-8 h-8 rounded-xl app-card flex items-center justify-center hover:text-white transition active:scale-95 text-xs">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Navegação de Abas -->
+  <nav class="border-b sticky top-[57px] z-30 px-2 py-1.5 flex items-center text-xs font-bold" style="background: var(--bg-color); border-color: var(--card-border); color: var(--text-muted);">
+    <button onclick="mudarAba('painel')" id="nav-painel" class="py-2 px-3 rounded-xl flex items-center space-x-1 transition active-nav-pill flex-shrink-0 mr-1.5 pr-3" style="border-right: 1px solid var(--card-border);">
+      <i class="fa-solid fa-gauge text-xs"></i>
+      <span>Painel</span>
+    </button>
+    <div class="flex items-center overflow-x-auto custom-scroll flex-1 min-w-0" style="-webkit-overflow-scrolling: touch;">
+      <button onclick="mudarAba('metas30')" id="nav-metas30" class="py-2 px-3 rounded-xl flex items-center space-x-1 transition flex-shrink-0">
+        <i class="fa-solid fa-bullseye text-xs"></i>
+        <span>Metas 30D</span>
+      </button>
+      <button onclick="mudarAba('metricas')" id="nav-metricas" class="py-2 px-3 rounded-xl flex items-center space-x-1 transition flex-shrink-0">
+        <i class="fa-solid fa-chart-pie text-xs"></i>
+        <span>Métricas</span>
+      </button>
+      <button onclick="mudarAba('calendario')" id="nav-calendario" class="py-2 px-3 rounded-xl flex items-center space-x-1 transition flex-shrink-0">
+        <i class="fa-solid fa-calendar-check text-xs"></i>
+        <span>Calendário</span>
+      </button>
+      <button onclick="mudarAba('backup')" id="nav-backup" class="py-2 px-3 rounded-xl flex items-center space-x-1 transition flex-shrink-0">
+        <i class="fa-solid fa-hard-drive text-xs"></i>
+        <span>Backup</span>
+      </button>
+      <button onclick="mudarAba('historico')" id="nav-historico" class="py-2 px-3 rounded-xl flex items-center space-x-1 transition flex-shrink-0">
+        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+        <span>Histórico</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="max-w-md mx-auto px-4 pt-3 space-y-3.5">
+
+    <!-- ========================================================================= -->
+    <!-- ⚡ ABA 1: PAINEL PRINCIPAL & NÚMEROS VERDES                               -->
+    <!-- ========================================================================= -->
+    <section id="aba-painel" class="space-y-3.5">
+
+      <!-- 🧠 TERMÔMETRO EMOCIONAL -->
+      <div class="app-card p-3 space-y-2">
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-[10px] uppercase font-bold" style="color: var(--text-muted);">Estado Psicológico</span>
+          <span class="text-appYellow text-[10px] font-bold" id="humorSelecionadoDisplay">🎯 Focado</span>
+        </div>
+        <div class="grid grid-cols-4 gap-1.5 text-[10px]">
+          <button onclick="selecionarHumor('Focado')" id="btnHumorFocado" class="humor-btn p-2 rounded-xl border border-appGreen text-white font-bold transition active:scale-95 text-center" style="background: rgba(0,0,0,0.3);">
+            🎯 Focado
+          </button>
+          <button onclick="selecionarHumor('Confiante')" id="btnHumorConfiante" class="humor-btn p-2 rounded-xl border text-gray-300 font-bold transition active:scale-95 text-center" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            ⚡ Confiante
+          </button>
+          <button onclick="selecionarHumor('Ansioso')" id="btnHumorAnsioso" class="humor-btn p-2 rounded-xl border text-gray-300 font-bold transition active:scale-95 text-center" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            ⚠️ Ansioso
+          </button>
+          <button onclick="selecionarHumor('Cansado')" id="btnHumorCansado" class="humor-btn p-2 rounded-xl border text-gray-300 font-bold transition active:scale-95 text-center" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            💤 Cansado
+          </button>
+        </div>
+      </div>
+
+      <!-- Trava de Meta Diária / Stop Loss -->
+      <div id="bannerTrava" class="hidden p-4 rounded-2xl border transition-all duration-300 shadow-2xl space-y-2">
+        <div class="flex items-center space-x-2">
+          <i id="iconeTrava" class="text-xl"></i>
+          <h3 id="tituloTrava" class="font-extrabold text-sm"></h3>
+        </div>
+        <p id="descTrava" class="text-xs opacity-90 font-medium"></p>
+        <div class="pt-1 flex justify-end">
+          <button onclick="destravarOperacoes()" class="px-3.5 py-1.5 bg-black/60 hover:bg-black/80 rounded-xl text-[11px] font-bold text-white border border-white/20 transition active:scale-95">
+            Destravar Operações
+          </button>
+        </div>
+      </div>
+
+      <!-- 💳 CARD BANCA ATUAL (COM NÚMEROS VERDES) -->
+      <div class="app-card p-4 space-y-3">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-1.5 text-xs font-bold tracking-wide" style="color: var(--text-muted);">
+            <i class="fa-solid fa-wallet text-appGreen"></i>
+            <span>BANCA ATUAL</span>
+          </div>
+          <span class="text-[11px] font-bold px-3 py-1 rounded-full border" id="dataAtualBadge" style="background: rgba(0,0,0,0.3); border-color: var(--card-border); color: #cbd5e1;">
+            Hoje
+          </span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <!-- Grande Número em Verde -->
+          <h2 class="text-3xl font-extrabold text-green-num tracking-tight" id="bancaAtualDisplay">
+            R$ 1.000,00
+          </h2>
+          <div id="lucroBadge" class="flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold bg-[#062c24] border border-appGreen/40 text-appGreen shadow">
+            <i class="fa-solid fa-arrow-trend-up text-[10px]"></i>
+            <span id="lucroTextoBadge">+R$ 0,00 (+0.0%)</span>
+          </div>
+        </div>
+
+        <p class="text-[11px] font-medium" style="color: var(--text-muted);">
+          Banca Inicial: <span id="bancaInicialSubDisplay" class="text-gray-300 font-bold">R$ 1.000,00</span>
+        </p>
+
+        <!-- Sub-barras de Meta do Dia e Stop Loss -->
+        <div class="space-y-2.5 pt-1">
+          <!-- Meta do Dia (vem da Meta 30D) -->
+          <div class="p-2.5 rounded-xl border space-y-1.5" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <div class="flex justify-between text-xs font-bold">
+              <span class="flex items-center space-x-1.5 text-gray-300">
+                <i class="fa-solid fa-circle-check text-appGreen"></i>
+                <span>Meta do Dia:</span>
+              </span>
+              <span class="text-green-num font-extrabold" id="metaDiaDisplay">+R$ 50,00 (+5%)</span>
+            </div>
+            <div class="w-full rounded-full h-2 overflow-hidden border" style="background: var(--card-bg); border-color: var(--card-border);">
+              <div id="metaProgressBar" class="bg-appGreen h-full w-0 transition-all duration-500"></div>
+            </div>
+            <p class="text-[10px] font-medium" style="color: var(--text-muted);" id="bancaAlvoDisplay">Banca-alvo do dia: R$ 1.050,00</p>
+          </div>
+
+          <!-- Limite Stop Loss -->
+          <div class="p-2.5 rounded-xl border space-y-1.5" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <div class="flex justify-between text-xs font-bold">
+              <span class="flex items-center space-x-1.5 text-gray-300">
+                <i class="fa-solid fa-ban text-appRed text-xs"></i>
+                <span>Stop Loss diário:</span>
+              </span>
+              <span class="text-appRed font-extrabold" id="stopLossDisplay">-R$ 100,00 (-10%)</span>
+            </div>
+            <div class="w-full rounded-full h-2 overflow-hidden border" style="background: var(--card-bg); border-color: var(--card-border);">
+              <div id="lossProgressBar" class="bg-appRed h-full w-0 transition-all duration-500"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🎯 DIVISOR DE META EM 3 SESSÕES -->
+        <div class="pt-2 border-t space-y-1.5" style="border-color: var(--card-border);">
+          <span class="text-[9px] uppercase font-bold block" style="color: var(--text-muted);">Divisor de Meta (3 Sessões Diárias):</span>
+          <div class="grid grid-cols-3 gap-1.5 text-[10px] text-center">
+            <div id="sessaoManhaCard" class="p-2 rounded-xl border transition-all duration-300" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+              <span class="text-[8px] block" style="color: var(--text-muted);">🌅 Manhã</span>
+              <b class="text-green-num font-bold" id="sessaoManhaMeta">R$ 50,00</b>
+              <span class="text-[8px] font-bold block mt-0.5" id="sessaoManhaStatus" style="color: var(--text-muted);">Pendente</span>
+            </div>
+            <div id="sessaoTardeCard" class="p-2 rounded-xl border transition-all duration-300" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+              <span class="text-[8px] block" style="color: var(--text-muted);">☀️ Tarde</span>
+              <b class="text-green-num font-bold" id="sessaoTardeMeta">R$ 50,00</b>
+              <span class="text-[8px] font-bold block mt-0.5" id="sessaoTardeStatus" style="color: var(--text-muted);">Pendente</span>
+            </div>
+            <div id="sessaoNoiteCard" class="p-2 rounded-xl border transition-all duration-300" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+              <span class="text-[8px] block" style="color: var(--text-muted);">🌙 Noite</span>
+              <b class="text-green-num font-bold" id="sessaoNoiteMeta">R$ 50,00</b>
+              <span class="text-[8px] font-bold block mt-0.5" id="sessaoNoiteStatus" style="color: var(--text-muted);">Pendente</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📊 GRADE DE 4 CARDS (COM NÚMEROS EM VERDE) -->
+      <div class="grid grid-cols-2 gap-3">
+        <!-- 1. TAXA DE ACERTO -->
+        <div class="app-card p-3 flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-[#062c24] border border-appGreen/30 flex items-center justify-center text-appGreen font-bold text-xs flex-shrink-0">
+            %
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold block" style="color: var(--text-muted);">TAXA DE ACERTO</span>
+            <span class="text-sm font-extrabold text-green-num" id="winRateDisplay">0.0%</span>
+          </div>
+        </div>
+
+        <!-- 2. GREENS -->
+        <div class="app-card p-3 flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-[#062c24] border border-appGreen/30 flex items-center justify-center text-appGreen text-xs flex-shrink-0">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold block" style="color: var(--text-muted);">GREENS</span>
+            <span class="text-sm font-extrabold text-green-num" id="totalGreensDisplay">0 Greens</span>
+          </div>
+        </div>
+
+        <!-- 3. REDS -->
+        <div class="app-card p-3 flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-[#2a0f14] border border-appRed/30 flex items-center justify-center text-appRed text-xs flex-shrink-0">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold block" style="color: var(--text-muted);">REDS</span>
+            <span class="text-sm font-extrabold text-appRed" id="totalRedsDisplay">0 Reds</span>
+          </div>
+        </div>
+
+        <!-- 4. OPERAÇÕES -->
+        <div class="app-card p-3 flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-[#281c06] border border-appYellow/30 flex items-center justify-center text-appYellow text-xs flex-shrink-0">
+            <i class="fa-solid fa-bars"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold block" style="color: var(--text-muted);">OPERAÇÕES</span>
+            <span class="text-sm font-extrabold text-white" id="totalOperacoesDisplay">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🧮 REGISTRO DE OPERAÇÃO -->
+      <div id="containerNovaEntrada" class="app-card p-4 space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-extrabold text-white">Registro de Operação</h3>
+          <span class="text-[10px] text-green-num font-bold" id="riscoSugeridoDisplay">Risco sugerido: R$ 20,00</span>
+        </div>
+
+        <div>
+          <label class="text-[10px] font-semibold mb-1 block uppercase" style="color: var(--text-muted);">Ativo / Operação (opcional)</label>
+          <input type="text" id="inputAtivo" maxlength="40" placeholder="Ex: WINFUT, BTC, EUR/USD" class="w-full border rounded-xl px-3 py-2 text-white text-xs focus:outline-none font-bold" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        </div>
+
+        <div>
+          <label class="text-[10px] font-semibold mb-1 block uppercase" style="color: var(--text-muted);">Valor financeiro real da operação (R$)</label>
+          <input type="number" id="inputValor" inputmode="decimal" step="any" min="0" placeholder="Ex: 35,50" class="w-full border rounded-xl px-3 py-2 text-white text-xs focus:outline-none font-bold" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+          <p class="text-[9px] mt-1 leading-tight" style="color: var(--text-muted);">Informe o valor em reais, sem sinal. O resultado entra na banca como lucro ou prejuízo conforme o botão escolhido.</p>
+        </div>
+
+        <div>
+          <label class="text-[10px] font-semibold mb-1 block uppercase" style="color: var(--text-muted);">Observação (opcional)</label>
+          <input type="text" id="inputObs" maxlength="140" placeholder="Ex: saída no stop, rompimento..." class="w-full border rounded-xl px-3 py-2 text-white text-xs focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <button onclick="registrarEntrada('GREEN')" id="btnGreen" class="py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-500 text-white font-extrabold text-xs shadow-lg active:scale-95 transition flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-arrow-trend-up text-sm"></i>
+            <span>GREEN (LUCRO)</span>
+          </button>
+          <button onclick="registrarEntrada('RED')" id="btnRed" class="py-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 text-white font-extrabold text-xs shadow-lg active:scale-95 transition flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-arrow-trend-down text-sm"></i>
+            <span>RED (PREJUÍZO)</span>
+          </button>
+        </div>
+        <button onclick="registrarEntrada('ZERO')" id="btnZero" class="w-full py-2.5 rounded-xl border text-gray-300 font-bold text-xs active:scale-95 transition flex items-center justify-center space-x-1.5" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+          <i class="fa-solid fa-equals text-xs"></i>
+          <span>ZERO A ZERO (resultado zerado)</span>
+        </button>
+      </div>
+
+      <!-- Gráfico de Banca -->
+      <div class="app-card p-4 space-y-2">
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Evolução da Banca</h3>
+        <div class="w-full h-36">
+          <canvas id="graficoBanca"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 🎯 ABA 2: METAS DE 30 DIAS                                                -->
+    <!-- ========================================================================= -->
+    <section id="aba-metas30" class="space-y-3.5 hidden">
+      <div class="app-card p-4 space-y-3 relative overflow-hidden">
+        <div class="flex justify-between items-center">
+          <h3 class="font-extrabold text-xs uppercase tracking-wider text-white">Plano de Metas 30 Dias</h3>
+          <button onclick="abrirConfigMetas30()" class="px-2.5 py-1 border rounded-lg text-[10px] text-appYellow font-bold transition" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <i class="fa-solid fa-gear mr-1"></i>Ajustar Metas
+          </button>
+        </div>
+
+        <div class="p-3 rounded-xl border space-y-2" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+          <div class="flex justify-between text-xs">
+            <span style="color: var(--text-muted);">Progresso do Desafio:</span>
+            <b class="text-green-num font-bold" id="progressoMetasBadge">0/30 Dias Batidos</b>
+          </div>
+          <div class="w-full rounded-full h-2.5 overflow-hidden border" style="background: var(--card-bg); border-color: var(--card-border);">
+            <div id="barraProgresso30D" class="bg-gradient-to-r from-amber-500 to-appGreen h-full w-0 transition-all duration-500"></div>
+          </div>
+          <div class="flex justify-between text-[10px] pt-1" style="color: var(--text-muted);">
+            <span>Banca Inicial: <b class="text-white" id="bancaInicial30DDisplay">R$ 1.000</b></span>
+            <span>Banca Alvo (Dia 30): <b class="text-green-num font-black" id="bancaFinalEstimadaDisplay">R$ 4.321</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-card p-4 space-y-3">
+        <div class="flex justify-between items-center border-b pb-2" style="border-color: var(--card-border);">
+          <h4 class="text-xs font-bold uppercase text-white tracking-wider">Cronograma de 30 Dias</h4>
+          <span class="text-[10px]" style="color: var(--text-muted);" id="tipoCalculoMetaBadge">Juros Compostos</span>
+        </div>
+        <div id="listaDias30" class="space-y-2 max-h-96 overflow-y-auto custom-scroll pr-1"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 📊 ABA 3: MÉTRICAS DE DESEMPENHO                                         -->
+    <!-- ========================================================================= -->
+    <section id="aba-metricas" class="space-y-3.5 hidden">
+      <div class="app-card p-4 space-y-3">
+        <div class="flex items-center space-x-2 text-appGreen">
+          <i class="fa-solid fa-chart-pie text-base"></i>
+          <h3 class="font-extrabold text-xs uppercase tracking-wider text-white">Métricas de Desempenho</h3>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <div class="p-3 rounded-xl border space-y-1" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] uppercase font-bold" style="color: var(--text-muted);">ROI sobre a Banca</span>
+            <p class="text-lg font-black text-green-num" id="roiPercentDisplay">0.0%</p>
+            <p class="text-[8px]" style="color: var(--text-muted);">Resultado ÷ banca inicial</p>
+          </div>
+          <div class="p-3 rounded-xl border space-y-1" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] uppercase font-bold" style="color: var(--text-muted);">Recorde de Greens</span>
+            <p class="text-lg font-black text-green-num" id="maxStreakDisplay">0 Seguidos</p>
+            <p class="text-[8px]" style="color: var(--text-muted);">Sequência máxima</p>
+          </div>
+          <div class="p-3 rounded-xl border space-y-1" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] uppercase font-bold" style="color: var(--text-muted);">Fator de Lucro</span>
+            <p class="text-sm font-black text-white" id="fatorLucroDisplay">—</p>
+            <p class="text-[8px]" style="color: var(--text-muted);">Lucro bruto ÷ prejuízo bruto</p>
+          </div>
+          <div class="p-3 rounded-xl border space-y-1" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] uppercase font-bold" style="color: var(--text-muted);">Média por Operação</span>
+            <p class="text-sm font-black text-green-num" id="lucroMedioDisplay">R$ 0,00</p>
+            <p class="text-[8px]" style="color: var(--text-muted);">Resultado médio</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+          <div class="p-2.5 rounded-xl border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[8px] block uppercase" style="color: var(--text-muted);">Maior Lucro</span>
+            <b class="text-green-num text-[11px]" id="maiorLucroDisplay">R$ 0,00</b>
+          </div>
+          <div class="p-2.5 rounded-xl border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[8px] block uppercase" style="color: var(--text-muted);">Maior Prejuízo</span>
+            <b class="text-appRed text-[11px]" id="maiorPrejuizoDisplay">R$ 0,00</b>
+          </div>
+          <div class="p-2.5 rounded-xl border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[8px] block uppercase" style="color: var(--text-muted);">Queda Máx. (Drawdown)</span>
+            <b class="text-appRed text-[11px]" id="drawdownDisplay">R$ 0,00</b>
+          </div>
+        </div>
+
+        <!-- Assertividade por Humor -->
+        <div class="p-3 rounded-xl border space-y-1.5 pt-2" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+          <span class="text-[10px] uppercase font-bold" style="color: var(--text-muted);">Taxa de acerto por Estado Psicológico:</span>
+          <div class="grid grid-cols-2 gap-2 text-[10px]" id="statsHumorBox"></div>
+        </div>
+      </div>
+
+      <div class="app-card p-4 space-y-2">
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Resultado Diário (últimos 30 dias)</h3>
+        <div class="w-full h-40"><canvas id="graficoDiario"></canvas></div>
+      </div>
+
+      <div class="app-card p-4 space-y-2">
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Desempenho Mensal (últimos 12 meses)</h3>
+        <div class="w-full h-40"><canvas id="graficoMensal"></canvas></div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 📅 ABA 4: CALENDÁRIO DE OPERAÇÕES (NAVEGADOR DE MESES)                       -->
+    <!-- ========================================================================= -->
+    <section id="aba-calendario" class="space-y-3.5 hidden">
+      <div class="app-card p-4 space-y-3">
+        <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--card-border);">
+          <button onclick="navegarMes(-1)" class="p-2 rounded-xl border text-xs active:scale-95 transition" style="background: rgba(0,0,0,0.3); border-color: var(--card-border); color: var(--text-muted);">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="text-center">
+            <h3 id="displayMesAno" class="font-extrabold text-xs uppercase text-white tracking-wider"></h3>
+            <span id="lucroMesSelecionado" class="text-[10px] font-semibold text-green-num">Total: R$ 0,00</span>
+          </div>
+          <button onclick="navegarMes(1)" class="p-2 rounded-xl border text-xs active:scale-95 transition" style="background: rgba(0,0,0,0.3); border-color: var(--card-border); color: var(--text-muted);">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-7 gap-1 text-center" id="gridCalendarioMes"></div>
+      </div>
+
+      <div class="app-card p-4 space-y-2.5">
+        <h4 class="text-xs font-bold uppercase text-white tracking-wider">Consolidado Mensal</h4>
+        <div class="grid grid-cols-2 gap-2 text-center text-xs">
+          <div class="p-2.5 rounded-xl border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] block uppercase" style="color: var(--text-muted);">Dias Green</span>
+            <b class="text-green-num text-sm" id="diasPositivosCount">0</b>
+          </div>
+          <div class="p-2.5 rounded-xl border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] block uppercase" style="color: var(--text-muted);">Dias Red</span>
+            <b class="text-appRed text-sm" id="diasNegativosCount">0</b>
+          </div>
+          <div class="p-2.5 rounded-xl border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] block uppercase" style="color: var(--text-muted);">Dias Zerados</span>
+            <b class="text-gray-300 text-sm" id="diasZeradosCount">0</b>
+          </div>
+          <div class="p-2.5 rounded-xl border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span class="text-[9px] block uppercase" style="color: var(--text-muted);">Resultado do Mês</span>
+            <b id="resultadoMesTotal" class="text-green-num text-sm font-black">R$ 0,00</b>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 🧮 ABA 5: BACKUP E RESTAURAÇÃO                                          -->
+    <!-- ========================================================================= -->
+    <section id="aba-backup" class="space-y-3.5 hidden">
+      <!-- Backup Total -->
+      <div class="app-card p-4 space-y-2.5">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xs font-black uppercase tracking-wider text-white flex items-center space-x-1.5">
+            <i class="fa-solid fa-hard-drive text-appGreen"></i>
+            <span>Central de Backup Total</span>
+          </h3>
+          <span class="text-[9px] text-green-num font-bold">100% OFFLINE</span>
+        </div>
+        <p class="text-[11px]" style="color: var(--text-muted);">
+          Salve todos os seus dados e meses em um arquivo ou restaure seu progresso em qualquer celular.
+        </p>
+        <div class="flex space-x-2 pt-1">
+          <button onclick="exportarBackupCompleto()" class="flex-1 py-2.5 border text-appGreen font-bold rounded-xl text-xs transition active:scale-95" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <i class="fa-solid fa-download mr-1"></i>Baixar Backup (.json)
+          </button>
+          <label class="flex-1 py-2.5 border text-appYellow font-bold rounded-xl text-xs transition text-center cursor-pointer active:scale-95" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <i class="fa-solid fa-upload mr-1"></i>Restaurar
+            <input type="file" id="inputRestaurarBackup" onchange="restaurarBackupCompleto(event)" class="hidden" accept=".json">
+          </label>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 📜 ABA 6: HISTÓRICO GERAL COM FILTROS                                    -->
+    <!-- ========================================================================= -->
+    <section id="aba-historico" class="space-y-3.5 hidden">
+      <div class="app-card p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider">Histórico de Operações</h3>
+          <button onclick="limparHistorico()" class="text-[10px] text-appRed transition">
+            Limpar Tudo
+          </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[9px] font-semibold mb-1 block uppercase" style="color: var(--text-muted);">Resultado</label>
+            <select id="filtroResultado" onchange="renderizarHistorico()" class="w-full border rounded-xl px-2 py-2 text-white text-xs focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+              <option value="todos">Todos</option>
+              <option value="GREEN">Lucro (Green)</option>
+              <option value="RED">Prejuízo (Red)</option>
+              <option value="ZERO">Zeradas</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[9px] font-semibold mb-1 block uppercase" style="color: var(--text-muted);">Período</label>
+            <select id="filtroPeriodo" onchange="renderizarHistorico()" class="w-full border rounded-xl px-2 py-2 text-white text-xs focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+              <option value="tudo">Tudo</option>
+              <option value="hoje">Hoje</option>
+              <option value="7d">Últimos 7 dias</option>
+              <option value="30d">Últimos 30 dias</option>
+              <option value="mes">Mês atual</option>
+            </select>
+          </div>
+        </div>
+        <input type="text" id="filtroAtivo" oninput="renderizarHistorico()" placeholder="Buscar por ativo ou observação" class="w-full border rounded-xl px-3 py-2 text-white text-xs focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        <p class="text-[10px] font-bold" id="resumoFiltro" style="color: var(--text-muted);">0 operações</p>
+
+        <div id="listaEntradas" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= 🎨 MODAL SELETOR DE 5 TEMAS ================= -->
+  <div id="modalTemas" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="app-card w-full max-w-xs p-5 space-y-3.5 text-xs shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-2" style="border-color: var(--card-border);">
+        <h3 class="font-extrabold text-white uppercase text-sm">Selecione o Tema (5 Opções)</h3>
+        <button onclick="fecharModalTemas()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+
+      <div class="space-y-2 font-bold">
+        <!-- 1. Deep Navy VIP -->
+        <button onclick="aplicarTema('theme-navy')" class="w-full p-3 bg-[#070d18] hover:bg-[#0c1628] border border-blue-500/40 rounded-xl text-left flex items-center justify-between text-blue-300 transition">
+          <span>🔵 Deep Navy VIP (Padrão)</span>
+          <span class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
+        </button>
+
+        <!-- 2. Cyber Neon Matrix -->
+        <button onclick="aplicarTema('theme-cyber')" class="w-full p-3 bg-[#030509] hover:bg-[#080f1e] border border-cyan-500/40 rounded-xl text-left flex items-center justify-between text-cyan-300 transition">
+          <span>💎 Cyber Neon Matrix</span>
+          <span class="w-3.5 h-3.5 rounded-full bg-cyan-400"></span>
+        </button>
+
+        <!-- 3. Gold Champagne Lux -->
+        <button onclick="aplicarTema('theme-gold')" class="w-full p-3 bg-[#050505] hover:bg-[#120e08] border border-amber-500/40 rounded-xl text-left flex items-center justify-between text-amber-300 transition">
+          <span>👑 Gold Champagne Lux</span>
+          <span class="w-3.5 h-3.5 rounded-full bg-amber-400"></span>
+        </button>
+
+        <!-- 4. Obsidian Stealth Carbon -->
+        <button onclick="aplicarTema('theme-stealth')" class="w-full p-3 bg-[#000000] hover:bg-[#141414] border border-zinc-500/40 rounded-xl text-left flex items-center justify-between text-zinc-300 transition">
+          <span>🖤 Obsidian Stealth Carbon</span>
+          <span class="w-3.5 h-3.5 rounded-full bg-zinc-400"></span>
+        </button>
+
+        <!-- 5. Emerald Royale -->
+        <button onclick="aplicarTema('theme-emerald')" class="w-full p-3 bg-[#020c08] hover:bg-[#071912] border border-emerald-500/40 rounded-xl text-left flex items-center justify-between text-emerald-300 transition">
+          <span>🌲 Emerald Royale</span>
+          <span class="w-3.5 h-3.5 rounded-full bg-emerald-400"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL COMPROVANTE VIP ================= -->
+  <div id="modalCardVip" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="app-card w-full max-w-sm p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-2" style="border-color: var(--card-border);">
+        <h3 class="font-black text-xs uppercase tracking-wider text-white flex items-center space-x-1.5">
+          <i class="fa-solid fa-medal text-appGreen"></i>
+          <span>Relatório de Performance</span>
+        </h3>
+        <button onclick="fecharCardVip()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="p-4 rounded-2xl border space-y-3 text-center" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        <span class="text-[10px] uppercase font-bold block" style="color: var(--text-muted);" id="vipDataDisplay">Hoje</span>
+        <h4 class="text-2xl font-black text-green-num" id="vipLucroDisplay">+R$ 0,00</h4>
+        <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t" style="border-color: var(--card-border);">
+          <div class="p-2 rounded-xl border" style="background: var(--card-bg); border-color: var(--card-border);">
+            <span class="text-[9px] block" style="color: var(--text-muted);">Taxa de acerto</span>
+            <b class="text-green-num font-bold" id="vipWinRateDisplay">0%</b>
+          </div>
+          <div class="p-2 rounded-xl border" style="background: var(--card-bg); border-color: var(--card-border);">
+            <span class="text-[9px] block" style="color: var(--text-muted);">Placar Geral</span>
+            <b class="text-white font-bold" id="vipPlacarDisplay">0G / 0R / 0Z</b>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="copiarComprovante()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-black rounded-xl hover:brightness-110 transition active:scale-95 text-xs uppercase tracking-wider">
+        <i class="fa-brands fa-whatsapp mr-1.5 text-sm"></i>Copiar Relatório p/ WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL AJUSTES GERAIS ================= -->
+  <div id="modalConfigGeral" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="app-card w-full max-w-sm p-5 space-y-4 shadow-2xl text-xs">
+      <div class="flex justify-between items-center border-b pb-2.5" style="border-color: var(--card-border);">
+        <h3 class="font-extrabold text-white text-sm uppercase">Configuração da Banca</h3>
+        <button onclick="fecharConfigGeral()" class="text-gray-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block mb-1 uppercase font-bold" style="color: var(--text-muted);">Banca Inicial (R$)</label>
+          <input type="number" id="cfgBancaInicial" class="w-full border rounded-xl p-2.5 text-white font-bold focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        </div>
+        <div>
+          <label class="block mb-1 uppercase font-bold" style="color: var(--text-muted);">% de Risco por Operação</label>
+          <input type="number" id="cfgRiscoPercent" value="2" step="any" class="w-full border rounded-xl p-2.5 text-white font-bold focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        </div>
+        <div>
+          <label class="block mb-1 uppercase font-bold" style="color: var(--text-muted);">Stop Loss diário (R$) — 0 desativa</label>
+          <input type="number" id="cfgStopLoss" class="w-full border rounded-xl p-2.5 text-white font-bold focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        </div>
+      </div>
+      <div class="pt-2">
+        <button onclick="salvarConfigGeral()" class="w-full py-3 bg-gradient-to-r from-amber-600 to-appYellow text-black font-black rounded-xl hover:brightness-110 transition active:scale-95 uppercase tracking-wider">
+          Gravar Configurações
+        </button>
+        <p class="text-[9px] mt-2 text-center leading-tight" style="color: var(--text-muted);">A meta diária é definida em Metas 30D.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL AJUSTES METAS 30 DIAS ================= -->
+  <div id="modalConfigMetas30" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="app-card w-full max-w-sm p-5 space-y-4 shadow-2xl text-xs">
+      <div class="flex justify-between items-center border-b pb-2.5" style="border-color: var(--card-border);">
+        <h3 class="font-extrabold text-white text-sm uppercase">Ajustar Desafio de 30 Dias</h3>
+        <button onclick="fecharConfigMetas30()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block mb-1 uppercase font-bold" style="color: var(--text-muted);">Tipo de Meta</label>
+          <select id="cfgTipoMeta30" onchange="toggleTipoMetaInputs()" class="w-full border rounded-xl p-2.5 text-white font-bold focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <option value="porcentagem">Juros Compostos (% ao Dia)</option>
+            <option value="fixa">Meta Fixa em Reais (R$/Dia)</option>
+          </select>
+        </div>
+        <div id="boxPercentMeta">
+          <label class="block mb-1 uppercase font-bold" style="color: var(--text-muted);">% de Meta Diária</label>
+          <input type="number" id="cfgPercentMeta30" value="5" class="w-full border rounded-xl p-2.5 text-white font-bold focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        </div>
+        <div id="boxFixaMeta" class="hidden">
+          <label class="block mb-1 uppercase font-bold" style="color: var(--text-muted);">Valor Fixo da Meta Diária (R$)</label>
+          <input type="number" id="cfgValorFixoMeta30" value="50" class="w-full border rounded-xl p-2.5 text-white font-bold focus:outline-none" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+        </div>
+      </div>
+      <div class="pt-2">
+        <button onclick="salvarConfigMetas30()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-green-500 text-white font-black rounded-xl hover:brightness-110 transition active:scale-95 uppercase tracking-wider">
+          Recalcular 30 Dias
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- JavaScript do Trade Rush -->
+  <script>
+    // ========================================================================= //
+    //  TRADE RUSH — gestão de banca e controle de operações                      //
+    //  Armazenamento 100% próprio e independente (chaves tr_*).                  //
+    // ========================================================================= //
+    const STORAGE_KEY = 'tr_trade_rush_db_v1';
+    const THEME_KEY = 'tr_tema_5opcoes';
+    const APP_ID = 'trade-rush';
+
+    function mudarAba(aba) {
+      const abas = ['painel', 'metas30', 'metricas', 'calendario', 'backup', 'historico'];
+      abas.forEach(a => {
+        const el = document.getElementById(`aba-${a}`);
+        const nav = document.getElementById(`nav-${a}`);
+        if (el) el.classList.add('hidden');
+        if (nav) nav.classList.remove('active-nav-pill');
+      });
+
+      const elAtivo = document.getElementById(`aba-${aba}`);
+      const navAtivo = document.getElementById(`nav-${aba}`);
+      if (elAtivo) elAtivo.classList.remove('hidden');
+      if (navAtivo) navAtivo.classList.add('active-nav-pill');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Gráficos criados enquanto a aba estava oculta precisam recalcular o tamanho
+      if (aba === 'metricas') {
+        [chartDiario, chartMensal].forEach(c => { if (c) { c.resize(); c.update(); } });
+      }
+    }
+
+    // Voz
+    let vozHabilitada = true;
+    function falar(texto) {
+      if (!vozHabilitada || !('speechSynthesis' in window) || !window.speechSynthesis) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(texto);
+        utter.lang = 'pt-BR';
+        utter.rate = 1.05;
+        window.speechSynthesis.speak(utter);
+      } catch (e) { /* voz indisponível: ignora */ }
+    }
+
+    function toggleVoz() {
+      vozHabilitada = !vozHabilitada;
+      const btn = document.getElementById('btnVoz');
+      btn.innerHTML = vozHabilitada ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark text-appRed"></i>';
+    }
+
+    // Temas
+    function abrirModalTemas() { document.getElementById('modalTemas').classList.remove('hidden'); }
+    function fecharModalTemas() { document.getElementById('modalTemas').classList.add('hidden'); }
+
+    // A cor da barra superior do navegador/PWA (iPhone/Android) acompanha o fundo do tema
+    function sincronizarCorBarraSuperior() {
+      try {
+        const cor = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (cor && meta) meta.setAttribute('content', cor);
+      } catch (e) { /* sem efeito visual se o navegador não permitir */ }
+    }
+
+    function aplicarTema(tema) {
+      document.documentElement.className = tema;
+      localStorage.setItem(THEME_KEY, tema);
+      sincronizarCorBarraSuperior();
+      fecharModalTemas();
+    }
+
+    // Estado psicológico
+    let humorAtual = 'Focado';
+    function selecionarHumor(humor) {
+      humorAtual = humor;
+      document.querySelectorAll('.humor-btn').forEach(b => b.classList.remove('border-appGreen'));
+      const btn = document.getElementById(`btnHumor${humor}`);
+      if (btn) btn.classList.add('border-appGreen');
+      document.getElementById('humorSelecionadoDisplay').textContent = `${humor === 'Focado' ? '🎯' : (humor === 'Confiante' ? '⚡' : (humor === 'Ansioso' ? '⚠️' : '💤'))} ${humor}`;
+      falar(`Humor registrado: ${humor}`);
+      atualizarUI();
+    }
+
+    // ========================================================================= //
+    //  ESTADO                                                                    //
+    // ========================================================================= //
+    let estado = {
+      app: APP_ID,
+      versao: 1,
+      bancaInicial: 1000,
+      riscoPercent: 2,
+      stopLoss: 100,
+      travaManualDesativada: false,
+      travaData: null,
+      metas30: { tipo: 'porcentagem', percentual: 5, valorFixo: 50 },
+      entradas: [],          // operações (mais recente primeiro)
+      historicoDiario: {}    // resultado financeiro por dia (AAAA-MM-DD)
+    };
+
+    let chartInstance = null;
+    let chartDiario = null;
+    let chartMensal = null;
+
+    // ---------- utilitários ----------
+    function round2(v) { return Math.round((Number(v) + Number.EPSILON) * 100) / 100; }
+    function brl(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function brlSinal(v) { return (v > 0 ? '+' : (v < 0 ? '-' : '')) + brl(Math.abs(v)); }
+    function escapeHtml(t) {
+      return String(t === undefined || t === null ? '' : t)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function formatarDataChave(chave) {
+      const p = String(chave || '').split('-');
+      return p.length === 3 ? `${p[2]}/${p[1]}` : '--/--';
+    }
+
+    function garantirEstruturaEstado() {
+      estado.app = APP_ID;
+      if (!estado.versao) estado.versao = 1;
+      if (!Array.isArray(estado.entradas)) estado.entradas = [];
+      if (!estado.historicoDiario || typeof estado.historicoDiario !== 'object') estado.historicoDiario = {};
+      if (!estado.metas30) estado.metas30 = { tipo: 'porcentagem', percentual: 5, valorFixo: 50 };
+      if (!(estado.bancaInicial > 0)) estado.bancaInicial = 1000;
+      if (!(estado.riscoPercent > 0)) estado.riscoPercent = 2;
+      if (!(estado.stopLoss >= 0)) estado.stopLoss = 100;
+      if (typeof estado.travaData === 'undefined') estado.travaData = null;
+      if (typeof estado.travaManualDesativada === 'undefined') estado.travaManualDesativada = false;
+    }
+
+    // Valida um arquivo de backup ANTES de substituir qualquer dado. Retorna texto do erro ou null.
+    function validarBackup(dados) {
+      if (!dados || typeof dados !== 'object') return 'Arquivo de backup inválido.';
+      if (dados.app !== APP_ID) return 'Este arquivo não é um backup do Trade Rush. Para proteger seus dados, ele não foi importado.';
+      if (!(Number(dados.bancaInicial) > 0)) return 'Backup inválido: banca inicial ausente ou incorreta.';
+      if (!Array.isArray(dados.entradas)) return 'Backup inválido: lista de operações ausente.';
+      for (const e of dados.entradas) {
+        if (!e || !Number.isFinite(Number(e.lucro)) || !['GREEN', 'RED', 'ZERO'].includes(e.resultado) || typeof e.dataChave !== 'string') {
+          return 'Backup inválido: há operações com dados incorretos.';
+        }
+      }
+      if (dados.historicoDiario && typeof dados.historicoDiario === 'object') {
+        for (const k of Object.keys(dados.historicoDiario)) {
+          if (!Number.isFinite(Number(dados.historicoDiario[k]))) return 'Backup inválido: histórico diário com valores incorretos.';
+        }
+      }
+      return null;
+    }
+
+    function carregarDados() {
+      const db = localStorage.getItem(STORAGE_KEY);
+      if (db) {
+        try {
+          const lido = JSON.parse(db);
+          if (lido && typeof lido === 'object') estado = lido;
+        } catch (err) {
+          // dados ilegíveis: guarda uma cópia para recuperação e inicia limpo (sem apagar o original)
+          localStorage.setItem(STORAGE_KEY + '_ilegivel', db);
+        }
+      }
+      garantirEstruturaEstado();
+
+      const temaSalvo = localStorage.getItem(THEME_KEY) || 'theme-navy';
+      document.documentElement.className = temaSalvo;
+      sincronizarCorBarraSuperior();
+
+      document.getElementById('dataAtualBadge').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
+      initChart();
+      initGraficosMetricas();
+
+      // Garante que uma trava de um dia anterior nunca continue ativa hoje
+      verificarViradaDoDia();
+
+      atualizarUI();
+      renderizarMesCalendario();
+      renderizarMetas30Dias();
+
+      // Verifica a virada do dia automaticamente a cada 30 segundos
+      setInterval(verificarViradaDoDia, 30000);
+    }
+
+    function salvarDados() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+      atualizarUI();
+      renderizarMesCalendario();
+      renderizarMetas30Dias();
+    }
+
+    // ========================================================================= //
+    //  DATA / META DO DIA (Meta 30D é a fonte oficial da meta diária)            //
+    // ========================================================================= //
+    function getChaveDataHoje() {
+      const h = new Date();
+      return `${h.getFullYear()}-${String(h.getMonth() + 1).padStart(2, '0')}-${String(h.getDate()).padStart(2, '0')}`;
+    }
+
+    function chaveDiasAtras(n) {
+      const d = new Date();
+      d.setDate(d.getDate() - n);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    // 🎯 Resultado financeiro EXCLUSIVO do dia atual
+    function getLucroHoje() {
+      const hoje = getChaveDataHoje();
+      return Number(estado.historicoDiario?.[hoje] || 0);
+    }
+
+    // Em qual "dia" da progressão da Meta 30D estamos HOJE (critério sequencial da tabela de 30 dias)
+    function getDiaAtualMeta30D() {
+      const chavesHistorico = Object.keys(estado.historicoDiario).sort();
+      const hojeKey = getChaveDataHoje();
+      const idx = chavesHistorico.indexOf(hojeKey);
+      const dia = idx >= 0 ? idx + 1 : chavesHistorico.length + 1;
+      return Math.min(dia, 30);
+    }
+
+    // 🎯 Meta do DIA ATUAL — mesma lógica de juros compostos (ou meta fixa) da tabela de 30 dias
+    function getMetaDoDiaAtual() {
+      const mCfg = estado.metas30 || { tipo: 'porcentagem', percentual: 5, valorFixo: 50 };
+      const isPercent = mCfg.tipo === 'porcentagem';
+      const diaAlvo = getDiaAtualMeta30D();
+
+      let bancaAcumulada = estado.bancaInicial;
+      let metaDiaValor = isPercent ? (bancaAcumulada * (mCfg.percentual / 100)) : (parseFloat(mCfg.valorFixo) || 50);
+
+      for (let dia = 1; dia <= diaAlvo; dia++) {
+        metaDiaValor = isPercent ? (bancaAcumulada * (mCfg.percentual / 100)) : (parseFloat(mCfg.valorFixo) || 50);
+        if (dia === diaAlvo) {
+          return { dia: diaAlvo, metaDia: metaDiaValor, bancaBase: bancaAcumulada, bancaAlvo: bancaAcumulada + metaDiaValor };
+        }
+        bancaAcumulada = bancaAcumulada + metaDiaValor;
+      }
+      return { dia: diaAlvo, metaDia: metaDiaValor, bancaBase: bancaAcumulada, bancaAlvo: bancaAcumulada + metaDiaValor };
+    }
+
+    // Divide a meta do dia em 3 partes ajustando centavos para a soma bater exatamente
+    function distribuirMetaSessoes(metaDia) {
+      const totalCents = Math.round(metaDia * 100);
+      const baseCents = Math.floor(totalCents / 3);
+      const resto = totalCents - (baseCents * 3);
+      const valoresCents = [baseCents, baseCents, baseCents];
+      for (let i = 0; i < resto; i++) valoresCents[i] += 1;
+      return valoresCents.map(v => v / 100);
+    }
+
+    function getSessaoAtual() {
+      const hora = new Date().getHours();
+      if (hora >= 6 && hora < 12) return 'manha';
+      if (hora >= 12 && hora < 18) return 'tarde';
+      return 'noite';
+    }
+
+    // Resultado financeiro de HOJE em uma sessão (manhã/tarde/noite), com base nas operações reais
+    function getLucroSessaoHoje(sessao) {
+      const hoje = getChaveDataHoje();
+      const entradasHoje = estado.entradas.filter(e => e.dataChave === hoje);
+      return entradasHoje
+        .filter(e => {
+          const hora = parseInt((e.hora || '00:00').split(':')[0], 10);
+          if (sessao === 'manha') return hora >= 6 && hora < 12;
+          if (sessao === 'tarde') return hora >= 12 && hora < 18;
+          return hora >= 18 || hora < 6;
+        })
+        .reduce((total, e) => total + Number(e.lucro || 0), 0);
+    }
+
+    // 🕛 Detecta a virada do dia e libera a trava antiga
+    function verificarViradaDoDia() {
+      const hoje = getChaveDataHoje();
+      if (estado.travaData && estado.travaData !== hoje) {
+        estado.travaData = null;
+        estado.travaManualDesativada = false;
+        salvarDados();
+      }
+      atualizarUI();
+    }
+
+    // ========================================================================= //
+    //  REGISTRO DE OPERAÇÕES                                                     //
+    //  tipo: 'GREEN' (lucro) | 'RED' (prejuízo) | 'ZERO' (resultado zerado)      //
+    //  O valor informado é o resultado financeiro REAL da operação (em R$).      //
+    // ========================================================================= //
+    function registrarEntrada(tipo) {
+      if (!['GREEN', 'RED', 'ZERO'].includes(tipo)) return;
+
+      let valor = 0;
+      if (tipo !== 'ZERO') {
+        valor = parseFloat(String(document.getElementById('inputValor').value).replace(',', '.'));
+        if (!Number.isFinite(valor) || valor <= 0) {
+          alert('Informe o valor financeiro real da operação (maior que zero).');
+          return;
+        }
+        valor = round2(valor);
+      }
+
+      const lucro = tipo === 'GREEN' ? valor : (tipo === 'RED' ? -valor : 0);
+
+      if (tipo === 'GREEN') falar('Green confirmado!');
+      else if (tipo === 'RED') falar('Red registrado.');
+      else falar('Operação zerada registrada.');
+
+      // id único mesmo que duas operações sejam registradas no mesmo milissegundo
+      let novoId = Date.now();
+      while (estado.entradas.some(e => e.id === novoId)) novoId++;
+
+      const novaEntrada = {
+        id: novoId,
+        humor: humorAtual,
+        dataChave: getChaveDataHoje(),
+        hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        ativo: (document.getElementById('inputAtivo').value || '').trim().slice(0, 40),
+        obs: (document.getElementById('inputObs').value || '').trim().slice(0, 140),
+        valor: valor,
+        resultado: tipo,
+        lucro: lucro
+      };
+
+      estado.entradas.unshift(novaEntrada);
+
+      const hojeKey = getChaveDataHoje();
+      estado.historicoDiario[hojeKey] = round2((estado.historicoDiario[hojeKey] || 0) + lucro);
+
+      document.getElementById('inputValor').value = '';
+      document.getElementById('inputAtivo').value = '';
+      document.getElementById('inputObs').value = '';
+      salvarDados();
+    }
+
+    function removerEntrada(id) {
+      const entrada = estado.entradas.find(e => e.id === id);
+      estado.entradas = estado.entradas.filter(e => e.id !== id);
+      if (entrada && entrada.dataChave) {
+        const novo = round2((estado.historicoDiario[entrada.dataChave] || 0) - entrada.lucro);
+        const aindaTemOperacoes = estado.entradas.some(e => e.dataChave === entrada.dataChave);
+        // Um dia sem nenhuma operação deixa de existir no histórico diário
+        if (!aindaTemOperacoes && novo === 0) delete estado.historicoDiario[entrada.dataChave];
+        else estado.historicoDiario[entrada.dataChave] = novo;
+      }
+      salvarDados();
+    }
+
+    function destravarOperacoes() {
+      estado.travaManualDesativada = true;
+      document.getElementById('bannerTrava').classList.add('hidden');
+      ['btnGreen', 'btnRed', 'btnZero'].forEach(id => { document.getElementById(id).disabled = false; });
+      document.getElementById('containerNovaEntrada').classList.remove('opacity-50', 'pointer-events-none');
+      salvarDados();
+    }
+
+    function setBotoesRegistro(desabilitado) {
+      ['btnGreen', 'btnRed', 'btnZero'].forEach(id => { document.getElementById(id).disabled = desabilitado; });
+    }
+
+    function verificarTravas() {
+      const banner = document.getElementById('bannerTrava');
+      const icone = document.getElementById('iconeTrava');
+      const titulo = document.getElementById('tituloTrava');
+      const desc = document.getElementById('descTrava');
+      const containerEntrada = document.getElementById('containerNovaEntrada');
+
+      const hoje = getChaveDataHoje();
+
+      // Uma trava de um dia anterior nunca pode continuar ativa hoje
+      if (estado.travaData && estado.travaData !== hoje) {
+        estado.travaData = null;
+      }
+
+      if (estado.travaManualDesativada) {
+        banner.classList.add('hidden');
+        containerEntrada.classList.remove('opacity-50', 'pointer-events-none');
+        setBotoesRegistro(false);
+        return;
+      }
+
+      const lucroHoje = getLucroHoje();
+      const jaTravadoHoje = estado.travaData === hoje;
+      const metaDiariaAtual = getMetaDoDiaAtual().metaDia;
+
+      if (lucroHoje >= metaDiariaAtual && metaDiariaAtual > 0) {
+        if (!jaTravadoHoje) falar('Parabéns! Meta diária batida.');
+        estado.travaData = hoje;
+        banner.className = 'p-4 rounded-2xl border border-appGreen bg-emerald-950/80 text-appGreen shadow-2xl block space-y-2 animate-bounce';
+        icone.className = 'fa-solid fa-trophy text-appGreen text-2xl';
+        titulo.textContent = '🎯 META DIÁRIA BATIDA!';
+        desc.textContent = `Você atingiu ${brlSinal(lucroHoje)} hoje. Proteja o resultado e volte amanhã!`;
+        containerEntrada.classList.add('opacity-50', 'pointer-events-none');
+        setBotoesRegistro(true);
+        return;
+      }
+
+      if (lucroHoje <= -estado.stopLoss && estado.stopLoss > 0) {
+        if (!jaTravadoHoje) falar('Stop Loss atingido.');
+        estado.travaData = hoje;
+        banner.className = 'p-4 rounded-2xl border border-appRed bg-rose-950/80 text-appRed shadow-2xl block space-y-2';
+        icone.className = 'fa-solid fa-hand text-appRed text-2xl';
+        titulo.textContent = '🛑 STOP LOSS DIÁRIO ATINGIDO!';
+        desc.textContent = `Atenção: limite de perdas atingido hoje (${brlSinal(lucroHoje)}). Pare por hoje!`;
+        containerEntrada.classList.add('opacity-50', 'pointer-events-none');
+        setBotoesRegistro(true);
+        return;
+      }
+
+      banner.classList.add('hidden');
+      containerEntrada.classList.remove('opacity-50', 'pointer-events-none');
+      setBotoesRegistro(false);
+    }
+
+    // 🎯 Estado visual (verde/pendente) das 3 sessões, sempre com base no dia atual
+    function atualizarSessoesDiarias() {
+      const metaDoDia = getMetaDoDiaAtual().metaDia;
+      const [metaManha, metaTarde, metaNoite] = distribuirMetaSessoes(metaDoDia);
+      const metasPorSessao = { manha: metaManha, tarde: metaTarde, noite: metaNoite };
+      const sessoes = [
+        { chave: 'manha', prefixo: 'sessaoManha' },
+        { chave: 'tarde', prefixo: 'sessaoTarde' },
+        { chave: 'noite', prefixo: 'sessaoNoite' }
+      ];
+
+      sessoes.forEach(({ chave, prefixo }) => {
+        const lucroSessao = getLucroSessaoHoje(chave);
+        const metaSessao = metasPorSessao[chave];
+        const metaEl = document.getElementById(`${prefixo}Meta`);
+        const cardEl = document.getElementById(`${prefixo}Card`);
+        const statusEl = document.getElementById(`${prefixo}Status`);
+
+        if (metaEl) metaEl.textContent = brl(metaSessao);
+
+        const bateu = metaSessao > 0 && lucroSessao >= metaSessao;
+
+        if (metaEl) {
+          metaEl.classList.toggle('text-green-num', !bateu);
+          metaEl.style.color = bateu ? '#00f59b' : '';
+        }
+
+        if (cardEl) {
+          if (bateu) {
+            cardEl.style.background = 'rgba(16, 185, 129, 0.14)';
+            cardEl.style.borderColor = '#10b981';
+          } else {
+            cardEl.style.background = 'rgba(0,0,0,0.3)';
+            cardEl.style.borderColor = 'var(--card-border)';
+          }
+        }
+
+        if (statusEl) {
+          statusEl.textContent = bateu ? '✓ META BATIDA' : 'Pendente';
+          statusEl.style.color = bateu ? '#10b981' : 'var(--text-muted)';
+        }
+      });
+    }
+
+    // ========================================================================= //
+    //  GRÁFICOS                                                                  //
+    // ========================================================================= //
+    const COR_GREEN = '#10b981';
+    const COR_RED = '#ef4444';
+    const COR_ZERO = '#64748b';
+
+    function initChart() {
+      if (typeof Chart === 'undefined') return; // biblioteca de gráficos indisponível (offline sem cache)
+      const ctx = document.getElementById('graficoBanca').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Início'],
+          datasets: [{
+            label: 'Banca (R$)',
+            data: [estado.bancaInicial],
+            borderColor: COR_GREEN,
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            borderWidth: 2.5,
+            tension: 0.35,
+            fill: true,
+            pointRadius: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { display: false },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8194b0', font: { size: 9 } } }
+          }
+        }
+      });
+    }
+
+    function criarGraficoBarras(idCanvas) {
+      if (typeof Chart === 'undefined') return null;
+      const el = document.getElementById(idCanvas);
+      if (!el) return null;
+      return new Chart(el.getContext('2d'), {
+        type: 'bar',
+        data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 3 }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#8194b0', font: { size: 8 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8194b0', font: { size: 9 } } }
+          }
+        }
+      });
+    }
+
+    function initGraficosMetricas() {
+      chartDiario = criarGraficoBarras('graficoDiario');
+      chartMensal = criarGraficoBarras('graficoMensal');
+    }
+
+    // Evolução da banca: a partir da banca inicial, operação por operação (ordem cronológica)
+    function atualizarGrafico() {
+      if (!chartInstance) return;
+      let pontos = [estado.bancaInicial];
+      let labels = ['Início'];
+      let acumulado = estado.bancaInicial;
+
+      [...estado.entradas].reverse().forEach((e, idx) => {
+        acumulado = round2(acumulado + e.lucro);
+        pontos.push(acumulado);
+        labels.push(`#${idx + 1}`);
+      });
+
+      chartInstance.data.labels = labels;
+      chartInstance.data.datasets[0].data = pontos;
+      chartInstance.update();
+    }
+
+    function corDoValor(v) { return v > 0 ? COR_GREEN : (v < 0 ? COR_RED : COR_ZERO); }
+
+    // Resultado diário (últimos 30 dias) e desempenho mensal (últimos 12 meses)
+    function dadosGraficoDiario() {
+      const labels = [], valores = [];
+      for (let i = 29; i >= 0; i--) {
+        const chave = chaveDiasAtras(i);
+        labels.push(formatarDataChave(chave));
+        valores.push(round2(estado.historicoDiario[chave] || 0));
+      }
+      return { labels, valores };
+    }
+
+    function dadosGraficoMensal() {
+      const labels = [], valores = [];
+      const base = new Date();
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(base.getFullYear(), base.getMonth() - i, 1);
+        const prefixo = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        let soma = 0;
+        Object.keys(estado.historicoDiario).forEach(k => { if (k.startsWith(prefixo)) soma += Number(estado.historicoDiario[k]); });
+        labels.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(2)}`);
+        valores.push(round2(soma));
+      }
+      return { labels, valores };
+    }
+
+    function atualizarGraficosMetricas() {
+      if (chartDiario) {
+        const d = dadosGraficoDiario();
+        chartDiario.data.labels = d.labels;
+        chartDiario.data.datasets[0].data = d.valores;
+        chartDiario.data.datasets[0].backgroundColor = d.valores.map(corDoValor);
+        chartDiario.update();
+      }
+      if (chartMensal) {
+        const m = dadosGraficoMensal();
+        chartMensal.data.labels = m.labels;
+        chartMensal.data.datasets[0].data = m.valores;
+        chartMensal.data.datasets[0].backgroundColor = m.valores.map(corDoValor);
+        chartMensal.update();
+      }
+    }
+
+    function limparHistorico() {
+      if (confirm('Deseja realmente limpar todas as operações? Esta ação não pode ser desfeita.')) {
+        estado.entradas = [];
+        estado.historicoDiario = {};
+        estado.travaData = null;
+        salvarDados();
+      }
+    }
+
+    // ========================================================================= //
+    //  ESTATÍSTICAS (calculadas a partir das operações reais)                    //
+    // ========================================================================= //
+    function calcularEstatisticas() {
+      const s = {
+        totalLucro: 0, greens: 0, reds: 0, zeros: 0, operacoes: 0,
+        lucroBruto: 0, prejuizoBruto: 0, maiorLucro: 0, maiorPrejuizo: 0,
+        maxStreak: 0, drawdown: 0, drawdownPct: 0,
+        humorGreens: { Focado: 0, Confiante: 0, Ansioso: 0, Cansado: 0 },
+        humorTotals: { Focado: 0, Confiante: 0, Ansioso: 0, Cansado: 0 }
+      };
+      let streak = 0;
+      let equity = estado.bancaInicial, pico = equity;
+
+      [...estado.entradas].reverse().forEach(e => {   // ordem cronológica
+        const lucro = Number(e.lucro) || 0;
+        s.totalLucro += lucro;
+        s.operacoes++;
+        equity += lucro;
+        if (equity > pico) pico = equity;
+        const dd = pico - equity;
+        if (dd > s.drawdown) { s.drawdown = dd; s.drawdownPct = pico > 0 ? (dd / pico) * 100 : 0; }
+
+        const h = e.humor || 'Focado';
+        if (e.resultado === 'GREEN') {
+          s.greens++; s.lucroBruto += lucro; streak++;
+          if (streak > s.maxStreak) s.maxStreak = streak;
+          if (lucro > s.maiorLucro) s.maiorLucro = lucro;
+          s.humorTotals[h] = (s.humorTotals[h] || 0) + 1;
+          s.humorGreens[h] = (s.humorGreens[h] || 0) + 1;
+        } else if (e.resultado === 'RED') {
+          s.reds++; s.prejuizoBruto += Math.abs(lucro); streak = 0;
+          if (Math.abs(lucro) > s.maiorPrejuizo) s.maiorPrejuizo = Math.abs(lucro);
+          s.humorTotals[h] = (s.humorTotals[h] || 0) + 1;
+        } else {
+          s.zeros++; // resultado zerado: não conta como acerto nem erro e não quebra a sequência
+        }
+      });
+
+      s.totalLucro = round2(s.totalLucro);
+      s.decididas = s.greens + s.reds;
+      s.taxaAcerto = s.decididas > 0 ? (s.greens / s.decididas) * 100 : 0;
+      s.bancaAtual = round2(estado.bancaInicial + s.totalLucro);
+      s.roi = estado.bancaInicial > 0 ? (s.totalLucro / estado.bancaInicial) * 100 : 0;
+      s.mediaPorOperacao = s.operacoes > 0 ? s.totalLucro / s.operacoes : 0;
+      s.fatorLucro = s.prejuizoBruto > 0 ? s.lucroBruto / s.prejuizoBruto : (s.lucroBruto > 0 ? Infinity : null);
+      return s;
+    }
+
+    function atualizarUI() {
+      const s = calcularEstatisticas();
+      const bancaAtual = s.bancaAtual;
+      const totalLucro = s.totalLucro;
+      const riscoSugerido = bancaAtual * (estado.riscoPercent / 100);
+
+      // Banca
+      document.getElementById('bancaAtualDisplay').textContent = brl(bancaAtual);
+      document.getElementById('bancaInicialSubDisplay').textContent = brl(estado.bancaInicial);
+      document.getElementById('riscoSugeridoDisplay').textContent = `Risco sugerido: ${brl(riscoSugerido)}`;
+
+      const badge = document.getElementById('lucroBadge');
+      const percLucro = estado.bancaInicial > 0 ? ((totalLucro / estado.bancaInicial) * 100).toFixed(1) : '0.0';
+
+      if (totalLucro > 0) {
+        badge.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold bg-[#062c24] border border-appGreen/40 text-appGreen shadow';
+        document.getElementById('lucroTextoBadge').textContent = `+${brl(totalLucro)} (+${percLucro}%)`;
+      } else if (totalLucro < 0) {
+        badge.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold bg-[#2a0f14] border border-appRed/40 text-appRed shadow';
+        document.getElementById('lucroTextoBadge').textContent = `-${brl(Math.abs(totalLucro))} (${percLucro}%)`;
+      } else {
+        badge.className = 'flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold border text-gray-300';
+        document.getElementById('lucroTextoBadge').textContent = `${brl(0)} (0.0%)`;
+      }
+
+      // Meta do dia (vem da Meta 30D) e Stop Loss diário
+      const metaInfo = getMetaDoDiaAtual();
+      const percMeta = metaInfo.bancaBase > 0 ? ((metaInfo.metaDia / metaInfo.bancaBase) * 100).toFixed(1).replace(/\.0$/, '') : '0';
+      document.getElementById('metaDiaDisplay').textContent = `+${brl(metaInfo.metaDia)} (+${percMeta}%)`;
+      document.getElementById('bancaAlvoDisplay').textContent = `Banca-alvo do dia: ${brl(metaInfo.bancaAlvo)}`;
+
+      const percLoss = estado.bancaInicial > 0 ? ((estado.stopLoss / estado.bancaInicial) * 100).toFixed(1).replace(/\.0$/, '') : '0';
+      document.getElementById('stopLossDisplay').textContent = estado.stopLoss > 0 ? `-${brl(estado.stopLoss)} (-${percLoss}%)` : 'Desativado';
+
+      // Cards de desempenho
+      document.getElementById('winRateDisplay').textContent = `${s.taxaAcerto.toFixed(1)}%`;
+      document.getElementById('totalGreensDisplay').textContent = `${s.greens} Greens`;
+      document.getElementById('totalRedsDisplay').textContent = `${s.reds} Reds`;
+      document.getElementById('totalOperacoesDisplay').textContent = s.operacoes;
+
+      atualizarSessoesDiarias();
+
+      // Métricas
+      document.getElementById('roiPercentDisplay').textContent = `${s.roi >= 0 ? '+' : ''}${s.roi.toFixed(1)}%`;
+      document.getElementById('maxStreakDisplay').textContent = `${s.maxStreak} Seguidos`;
+      document.getElementById('fatorLucroDisplay').textContent = s.fatorLucro === null ? '—' : (s.fatorLucro === Infinity ? '∞' : s.fatorLucro.toFixed(2));
+      document.getElementById('lucroMedioDisplay').textContent = brlSinal(round2(s.mediaPorOperacao));
+      document.getElementById('maiorLucroDisplay').textContent = brl(s.maiorLucro);
+      document.getElementById('maiorPrejuizoDisplay').textContent = s.maiorPrejuizo > 0 ? `-${brl(s.maiorPrejuizo)}` : brl(0);
+      document.getElementById('drawdownDisplay').textContent = s.drawdown > 0 ? `-${brl(s.drawdown)} (${s.drawdownPct.toFixed(1)}%)` : brl(0);
+
+      const statsBox = document.getElementById('statsHumorBox');
+      if (statsBox) {
+        statsBox.innerHTML = Object.keys(s.humorTotals).map(k => {
+          const tot = s.humorTotals[k] || 0;
+          const grn = s.humorGreens[k] || 0;
+          const wr = tot > 0 ? Math.round((grn / tot) * 100) : 0;
+          return `
+            <div class="p-2 rounded-xl border flex justify-between" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+              <span style="color: var(--text-muted);">${k}:</span>
+              <b class="text-green-num font-bold">${wr}% <span class="text-[8px] text-gray-400">(${tot} ops)</span></b>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Barras de progresso (diárias — usam somente o resultado de HOJE)
+      const lucroHojeBarras = getLucroHoje();
+      const barraWin = document.getElementById('metaProgressBar');
+      if (lucroHojeBarras > 0 && metaInfo.metaDia > 0) {
+        barraWin.style.width = `${Math.min(100, (lucroHojeBarras / metaInfo.metaDia) * 100)}%`;
+      } else {
+        barraWin.style.width = '0%';
+      }
+      const barraLoss = document.getElementById('lossProgressBar');
+      if (lucroHojeBarras < 0 && estado.stopLoss > 0) {
+        barraLoss.style.width = `${Math.min(100, (Math.abs(lucroHojeBarras) / estado.stopLoss) * 100)}%`;
+      } else {
+        barraLoss.style.width = '0%';
+      }
+
+      verificarTravas();
+      atualizarGrafico();
+      atualizarGraficosMetricas();
+      renderizarHistorico();
+    }
+
+    // ========================================================================= //
+    //  HISTÓRICO COM FILTROS                                                     //
+    // ========================================================================= //
+    function entradasFiltradas() {
+      const fRes = document.getElementById('filtroResultado').value;
+      const fPer = document.getElementById('filtroPeriodo').value;
+      const fBusca = (document.getElementById('filtroAtivo').value || '').trim().toLowerCase();
+
+      const hoje = getChaveDataHoje();
+      const mesAtual = hoje.slice(0, 7);
+
+      return estado.entradas.filter(e => {
+        if (fRes !== 'todos' && e.resultado !== fRes) return false;
+        if (fPer === 'hoje' && e.dataChave !== hoje) return false;
+        if (fPer === '7d' && e.dataChave < chaveDiasAtras(6)) return false;
+        if (fPer === '30d' && e.dataChave < chaveDiasAtras(29)) return false;
+        if (fPer === 'mes' && !String(e.dataChave).startsWith(mesAtual)) return false;
+        if (fBusca) {
+          const alvo = `${e.ativo || ''} ${e.obs || ''}`.toLowerCase();
+          if (!alvo.includes(fBusca)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderizarHistorico() {
+      const lista = document.getElementById('listaEntradas');
+      const resumo = document.getElementById('resumoFiltro');
+      if (!lista) return;
+
+      if (estado.entradas.length === 0) {
+        lista.innerHTML = `<div class="text-center py-6 text-xs" style="color: var(--text-muted);">Nenhuma operação registrada.</div>`;
+        resumo.textContent = '0 operações';
+        return;
+      }
+
+      const filtradas = entradasFiltradas();
+      const soma = round2(filtradas.reduce((t, e) => t + Number(e.lucro || 0), 0));
+      resumo.textContent = `${filtradas.length} ${filtradas.length === 1 ? 'operação' : 'operações'} • Resultado: ${brlSinal(soma)}`;
+      resumo.style.color = soma > 0 ? COR_GREEN : (soma < 0 ? COR_RED : 'var(--text-muted)');
+
+      if (filtradas.length === 0) {
+        lista.innerHTML = `<div class="text-center py-6 text-xs" style="color: var(--text-muted);">Nenhuma operação encontrada com esses filtros.</div>`;
+        return;
+      }
+
+      lista.innerHTML = filtradas.map(e => {
+        const cls = e.resultado === 'GREEN' ? 'text-green-num' : (e.resultado === 'RED' ? 'text-appRed' : 'text-gray-300');
+        const dot = e.resultado === 'GREEN' ? 'bg-appGreen' : (e.resultado === 'RED' ? 'bg-appRed' : 'bg-gray-500');
+        const rotulo = e.resultado === 'GREEN' ? 'LUCRO' : (e.resultado === 'RED' ? 'PREJUÍZO' : 'ZERADA');
+        const titulo = e.ativo ? escapeHtml(e.ativo) : 'Operação';
+        const obs = e.obs ? `<p class="text-[9px] italic" style="color: var(--text-muted);">${escapeHtml(e.obs)}</p>` : '';
+        return `
+        <div class="flex items-center justify-between p-2.5 rounded-xl border text-xs" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+          <div class="flex items-center space-x-2 min-w-0">
+            <span class="w-2 h-2 rounded-full flex-shrink-0 ${dot}"></span>
+            <div class="min-w-0">
+              <p class="font-bold text-white truncate">${titulo} <span class="font-normal text-[9px]" style="color: var(--text-muted);">(${rotulo})</span></p>
+              <p class="text-[9px]" style="color: var(--text-muted);">${formatarDataChave(e.dataChave)} ${escapeHtml(e.hora)} • [${escapeHtml(e.humor || '🎯')}]</p>
+              ${obs}
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            <span class="font-extrabold ${cls}">${brlSinal(Number(e.lucro))}</span>
+            <button onclick="removerEntrada(${Number(e.id)})" class="text-gray-400 hover:text-appRed p-1" title="Remover operação">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ========================================================================= //
+    //  RELATÓRIO DE PERFORMANCE                                                  //
+    // ========================================================================= //
+    function gerarCardVip() {
+      const s = calcularEstatisticas();
+      const perc = estado.bancaInicial > 0 ? ((s.totalLucro / estado.bancaInicial) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('vipDataDisplay').textContent = new Date().toLocaleDateString('pt-BR');
+      document.getElementById('vipLucroDisplay').textContent = `${brlSinal(s.totalLucro)} (${perc}%)`;
+      document.getElementById('vipLucroDisplay').className = s.totalLucro >= 0 ? 'text-2xl font-black text-green-num' : 'text-2xl font-black text-appRed';
+      document.getElementById('vipWinRateDisplay').textContent = `${s.taxaAcerto.toFixed(0)}%`;
+      document.getElementById('vipPlacarDisplay').textContent = `${s.greens}G / ${s.reds}R / ${s.zeros}Z`;
+
+      document.getElementById('modalCardVip').classList.remove('hidden');
+    }
+
+    function fecharCardVip() { document.getElementById('modalCardVip').classList.add('hidden'); }
+
+    function copiarComprovante() {
+      const s = calcularEstatisticas();
+      const dataHoje = new Date().toLocaleDateString('pt-BR');
+      const texto = `📈 *RELATÓRIO TRADE RUSH* 📈\n📅 Data: ${dataHoje}\n💰 Resultado acumulado: ${brlSinal(s.totalLucro)}\n🏦 Banca atual: ${brl(s.bancaAtual)}\n🎯 Taxa de acerto: ${s.taxaAcerto.toFixed(0)}%\n📊 Operações: ${s.greens} Greens / ${s.reds} Reds / ${s.zeros} Zeradas`;
+
+      navigator.clipboard.writeText(texto).then(() => {
+        alert('✅ Relatório copiado! Agora basta colar no seu WhatsApp ou Telegram!');
+        fecharCardVip();
+      }).catch(() => {
+        alert('Não foi possível copiar automaticamente. Selecione e copie o texto manualmente:\n\n' + texto);
+      });
+    }
+
+    // ========================================================================= //
+    //  BACKUP / RESTAURAÇÃO                                                      //
+    // ========================================================================= //
+    function exportarBackupCompleto() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(estado, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `tr_backup_completo_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function restaurarBackupCompleto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const dados = JSON.parse(e.target.result);
+          const erro = validarBackup(dados);
+          if (erro) { alert(erro); return; }
+          estado = dados;
+          garantirEstruturaEstado();
+          salvarDados();
+          alert('🎉 Backup restaurado com sucesso!');
+        } catch (err) {
+          alert('Erro ao ler o arquivo.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // ========================================================================= //
+    //  METAS 30 DIAS                                                             //
+    // ========================================================================= //
+    function renderizarMetas30Dias() {
+      const container = document.getElementById('listaDias30');
+      const tipoBadge = document.getElementById('tipoCalculoMetaBadge');
+      const progressoBadge = document.getElementById('progressoMetasBadge');
+      const barra30D = document.getElementById('barraProgresso30D');
+      const bancaInicialDisplay = document.getElementById('bancaInicial30DDisplay');
+      const bancaFinalDisplay = document.getElementById('bancaFinalEstimadaDisplay');
+
+      bancaInicialDisplay.textContent = brl(estado.bancaInicial);
+
+      const mCfg = estado.metas30 || { tipo: 'porcentagem', percentual: 5, valorFixo: 50 };
+      const isPercent = mCfg.tipo === 'porcentagem';
+
+      tipoBadge.textContent = isPercent ? `Juros Compostos (${mCfg.percentual}%/dia)` : `Meta Fixa (R$ ${mCfg.valorFixo}/dia)`;
+
+      let bancaAcumulada = estado.bancaInicial;
+      let html = '';
+      let metasBatidasCount = 0;
+
+      const chavesHistorico = Object.keys(estado.historicoDiario).sort();
+
+      for (let dia = 1; dia <= 30; dia++) {
+        let metaDiaValor = isPercent ? (bancaAcumulada * (mCfg.percentual / 100)) : (parseFloat(mCfg.valorFixo) || 50);
+        const bancaFinalDia = bancaAcumulada + metaDiaValor;
+
+        let statusTag = `<span class="text-[9px] px-2 py-0.5 rounded-full border" style="background: rgba(0,0,0,0.3); border-color: var(--card-border); color: var(--text-muted);">Pendente</span>`;
+
+        if (chavesHistorico[dia - 1]) {
+          const lucroRealDia = Number(estado.historicoDiario[chavesHistorico[dia - 1]]);
+          if (lucroRealDia >= metaDiaValor) {
+            metasBatidasCount++;
+            statusTag = `<span class="text-[9px] text-green-num bg-[#062c24] px-2 py-0.5 rounded-full border border-appGreen/40 font-bold">✓ Meta Batida</span>`;
+          } else if (lucroRealDia > 0) {
+            statusTag = `<span class="text-[9px] text-appYellow bg-[#281c06] px-2 py-0.5 rounded-full border border-appYellow/40 font-bold">Parcial (+R$ ${lucroRealDia.toFixed(0)})</span>`;
+          } else if (lucroRealDia === 0) {
+            statusTag = `<span class="text-[9px] text-gray-300 px-2 py-0.5 rounded-full border font-bold" style="border-color: var(--card-border);">Zerado</span>`;
+          } else {
+            statusTag = `<span class="text-[9px] text-appRed bg-[#2a0f14] px-2 py-0.5 rounded-full border border-appRed/40 font-bold">Red (R$ ${lucroRealDia.toFixed(0)})</span>`;
+          }
+        }
+
+        html += `
+          <div class="p-3 border rounded-xl flex items-center justify-between text-xs transition hover:border-appYellow/40" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <div class="flex items-center space-x-2.5">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-appYellow text-[11px] border" style="background: var(--card-bg); border-color: var(--card-border);">
+                ${dia}
+              </span>
+              <div>
+                <p class="font-bold text-white">Meta: <span class="text-green-num font-extrabold">+R$ ${metaDiaValor.toFixed(2)}</span></p>
+                <p class="text-[10px]" style="color: var(--text-muted);">Banca Esperada: R$ ${bancaFinalDia.toFixed(2)}</p>
+              </div>
+            </div>
+            <div>${statusTag}</div>
+          </div>
+        `;
+
+        bancaAcumulada = bancaFinalDia;
+      }
+
+      container.innerHTML = html;
+      bancaFinalDisplay.textContent = brl(bancaAcumulada);
+      progressoBadge.textContent = `${metasBatidasCount}/30 Dias Batidos`;
+      barra30D.style.width = `${(metasBatidasCount / 30) * 100}%`;
+    }
+
+    function abrirConfigMetas30() {
+      const mCfg = estado.metas30 || { tipo: 'porcentagem', percentual: 5, valorFixo: 50 };
+      document.getElementById('cfgTipoMeta30').value = mCfg.tipo;
+      document.getElementById('cfgPercentMeta30').value = mCfg.percentual || 5;
+      document.getElementById('cfgValorFixoMeta30').value = mCfg.valorFixo || 50;
+      toggleTipoMetaInputs();
+      document.getElementById('modalConfigMetas30').classList.remove('hidden');
+    }
+
+    function fecharConfigMetas30() { document.getElementById('modalConfigMetas30').classList.add('hidden'); }
+
+    function toggleTipoMetaInputs() {
+      const tipo = document.getElementById('cfgTipoMeta30').value;
+      if (tipo === 'porcentagem') {
+        document.getElementById('boxPercentMeta').classList.remove('hidden');
+        document.getElementById('boxFixaMeta').classList.add('hidden');
+      } else {
+        document.getElementById('boxPercentMeta').classList.add('hidden');
+        document.getElementById('boxFixaMeta').classList.remove('hidden');
+      }
+    }
+
+    function salvarConfigMetas30() {
+      const tipo = document.getElementById('cfgTipoMeta30').value;
+      const percent = parseFloat(document.getElementById('cfgPercentMeta30').value);
+      const fixa = parseFloat(document.getElementById('cfgValorFixoMeta30').value);
+
+      estado.metas30 = {
+        tipo: tipo,
+        percentual: (Number.isFinite(percent) && percent > 0) ? percent : 5,
+        valorFixo: (Number.isFinite(fixa) && fixa > 0) ? fixa : 50
+      };
+      salvarDados();
+      fecharConfigMetas30();
+    }
+
+    // ========================================================================= //
+    //  CALENDÁRIO                                                                //
+    // ========================================================================= //
+    let mesVisualizacao = new Date().getMonth();
+    let anoVisualizacao = new Date().getFullYear();
+
+    function navegarMes(delta) {
+      mesVisualizacao += delta;
+      if (mesVisualizacao < 0) {
+        mesVisualizacao = 11;
+        anoVisualizacao--;
+      } else if (mesVisualizacao > 11) {
+        mesVisualizacao = 0;
+        anoVisualizacao++;
+      }
+      renderizarMesCalendario();
+    }
+
+    function renderizarMesCalendario() {
+      const grid = document.getElementById('gridCalendarioMes');
+      const displayMesAno = document.getElementById('displayMesAno');
+      const lucroMesDisplay = document.getElementById('lucroMesSelecionado');
+
+      const dataObj = new Date(anoVisualizacao, mesVisualizacao, 1);
+      displayMesAno.textContent = `${dataObj.toLocaleString('pt-BR', { month: 'long' }).toUpperCase()} ${anoVisualizacao}`;
+
+      const totalDias = new Date(anoVisualizacao, mesVisualizacao + 1, 0).getDate();
+      let html = '', lucroMes = 0, diasPos = 0, diasNeg = 0, diasZero = 0;
+      const hoje = new Date();
+
+      for (let dia = 1; dia <= totalDias; dia++) {
+        const chave = `${anoVisualizacao}-${String(mesVisualizacao + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+        const lucroDia = estado.historicoDiario[chave];
+
+        let bg = 'border';
+        let statusTexto = '';
+
+        if (lucroDia !== undefined && lucroDia !== 0) {
+          lucroMes += Number(lucroDia);
+          if (lucroDia > 0) {
+            diasPos++;
+            bg = 'bg-[#062c24] text-appGreen border-appGreen/50 font-bold';
+            statusTexto = `+${Number(lucroDia).toFixed(0)}`;
+          } else {
+            diasNeg++;
+            bg = 'bg-[#2a0f14] text-appRed border-appRed/50 font-bold';
+            statusTexto = `${Number(lucroDia).toFixed(0)}`;
+          }
+        } else if (lucroDia === 0) {
+          diasZero++;
+          bg = 'border text-gray-300';
+          statusTexto = '0';
+        } else {
+          bg = 'border text-gray-500';
+        }
+
+        const isHoje = (dia === hoje.getDate() && mesVisualizacao === hoje.getMonth() && anoVisualizacao === hoje.getFullYear()) ? 'ring-1 ring-appYellow' : '';
+        html += `
+          <div class="p-1 rounded-xl flex flex-col items-center justify-center text-[10px] min-h-[34px] ${bg} ${isHoje}" style="background: rgba(0,0,0,0.3); border-color: var(--card-border);">
+            <span>${dia}</span>
+            <span class="text-[7px] tracking-tighter">${statusTexto}</span>
+          </div>
+        `;
+      }
+
+      grid.innerHTML = html;
+      lucroMes = round2(lucroMes);
+      lucroMesDisplay.textContent = `Total: ${brlSinal(lucroMes)}`;
+      document.getElementById('diasPositivosCount').textContent = diasPos;
+      document.getElementById('diasNegativosCount').textContent = diasNeg;
+      document.getElementById('diasZeradosCount').textContent = diasZero;
+      const resTotal = document.getElementById('resultadoMesTotal');
+      resTotal.textContent = brlSinal(lucroMes);
+      resTotal.className = lucroMes >= 0 ? 'text-green-num text-sm font-black' : 'text-appRed text-sm font-black';
+    }
+
+    // ========================================================================= //
+    //  CONFIGURAÇÕES                                                             //
+    // ========================================================================= //
+    function abrirConfigGeral() {
+      document.getElementById('cfgBancaInicial').value = estado.bancaInicial;
+      document.getElementById('cfgRiscoPercent').value = estado.riscoPercent || 2;
+      document.getElementById('cfgStopLoss').value = estado.stopLoss;
+      document.getElementById('modalConfigGeral').classList.remove('hidden');
+    }
+
+    function fecharConfigGeral() { document.getElementById('modalConfigGeral').classList.add('hidden'); }
+
+    function salvarConfigGeral() {
+      const banca = parseFloat(document.getElementById('cfgBancaInicial').value);
+      const risco = parseFloat(document.getElementById('cfgRiscoPercent').value);
+      const stop = parseFloat(document.getElementById('cfgStopLoss').value);
+
+      estado.bancaInicial = (Number.isFinite(banca) && banca > 0) ? banca : 1000;
+      estado.riscoPercent = (Number.isFinite(risco) && risco > 0) ? risco : 2;
+      estado.stopLoss = (Number.isFinite(stop) && stop >= 0) ? stop : 100; // 0 = Stop Loss desativado
+      estado.travaManualDesativada = false;
+      salvarDados();
+      fecharConfigGeral();
+    }
+
+    window.onload = carregarDados;
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
